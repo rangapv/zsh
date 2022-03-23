@@ -1,0 +1,41 @@
+#!/bin/zsh
+##!/bin/sh
+set +e
+
+echo "Hello"
+source="/Users/rangapv/sdir/*"
+dest="/Users/rangapv/ddir"
+#source="/var/opt/gitlab/importrepo/@hashed/"
+#dest="/var/opt/gitlab/git-data/repository-import"
+count=0
+gcount=0
+
+func() {
+
+t1="$@"
+#echo "t1 is $t1"
+
+for k in "$@"
+do
+  if [[ -d "$k" ]] && [[ ! "$k" =~ "git" ]] && [[ !  -z  `(ls -A "$k")` ]]
+  then
+   # echo "Before recursion $count and k is $k"
+    ((count+=1))
+    func $k/*
+  elif [[ "$k" =~ "git" ]]
+  then
+    ((gcount+=1))
+    #echo "Inside else $dest"
+    cp -r $k $dest
+  fi
+done
+
+}
+
+func /Users/rangapv/sdir/*
+#func /var/opt/gitlab/importrepo/@hashed/*
+echo "Total Parent and Sub Directory count is $count"
+echo "Total GITs present in them gcount is $gcount"
+
+#chown -R git:git /var/opt/gitlab/git-data/repository-import
+#gitlab-rake gitlab:import:repos["/var/opt/gitlab/git-data/repository-import"]
